@@ -28,48 +28,60 @@ export default function SearchFields({
     tripType,
 }: SearchFieldsProps) {
 
-    const {handleSubmit, from, setFrom, to, setTo, departureDate, setDepartureDate, returnDate, setReturnDate} = useProduct();
+    const { handleSubmit, from, setFrom, to, setTo, departureDate, setDepartureDate, returnDate, setReturnDate, searchFlights } = useProduct();
 
     return (
         <View style={styles.form}>
-           
+
             <Input
                 label="From"
                 placeholder="Departure city"
                 value={from}
-                onChangeText={setFrom}
+                onChangeText={(text) => {
+                    setFrom(text)
+                    searchFlights('from')
+                }}
                 iconName="mappin.and.ellipse"
             >
-               
+
             </Input>
 
-            
+
             <Input
                 label="To"
                 placeholder="Arrival city"
                 value={to}
-                onChangeText={setTo}
+                onChangeText={(text) => {
+                    setTo(text)
+                    searchFlights('to')
+                }}
                 iconName="mappin.and.ellipse"
             >
-               
+
             </Input>
 
-            
+
             <Input
                 label="Depart"
                 placeholder="YYYY-MM-DD"
                 value={departureDate}
-                onChangeText={setDepartureDate}
+                onChangeText={(text) => {
+                    setDepartureDate(text)
+                    searchFlights('departure')
+                }}
                 iconName="calendar"
             />
 
-           
+
             {tripType === 'roundTrip' && (
                 <Input
                     label="Return"
                     placeholder="YYYY-MM-DD"
                     value={returnDate}
-                    onChangeText={setReturnDate}
+                    onChangeText={(text) => {
+                    setReturnDate(text)
+                    searchFlights('return_date')
+                }}
                     iconName="calendar"
                 />
             )}
@@ -124,7 +136,7 @@ function Input({
                 />
             </View>
 
-            
+
             {focused && children}
         </View>
     )

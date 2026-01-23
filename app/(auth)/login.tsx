@@ -14,6 +14,11 @@ import * as WebBrowser from "expo-web-browser";
 
 import { supabase } from "../../lib/superbase";
 
+/**
+ * REQUIRED for OAuth redirect to complete
+ */
+WebBrowser.maybeCompleteAuthSession();
+
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -21,18 +26,19 @@ export default function LoginScreen() {
 
     const router = useRouter();
 
+
     useEffect(() => {
-        const { data: listener } = supabase.auth.onAuthStateChange(
-            (event, session) => {
-                if (event === "SIGNED_IN") {
+        const subscription = Linking.addEventListener("url", async ({ url }) => {
+            if (url.includes("auth/callback")) {
+                const { data } = await supabase.auth.getSession();
+
+                if (data.session) {
                     router.replace("/");
                 }
             }
-        );
+        });
 
-        return () => {
-            listener.subscription.unsubscribe();
-        };
+        return () => subscription.remove();
     }, []);
 
     const handleLogin = async () => {
@@ -55,6 +61,7 @@ export default function LoginScreen() {
             return;
         }
 
+        router.replace("/");
     };
 
     const handleGoogleLogin = async () => {
@@ -73,13 +80,9 @@ export default function LoginScreen() {
         }
 
         if (data?.url) {
-            await WebBrowser.openAuthSessionAsync(
-                data.url,
-                redirectTo
-            );
+            await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
         }
     };
-
 
     return (
         <View style={styles.container}>
@@ -126,15 +129,13 @@ export default function LoginScreen() {
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#ffffff",
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         justifyContent: "center",
     },
-
     title: {
         fontSize: 28,
         fontWeight: "700",
@@ -142,7 +143,6 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         color: "#111827",
     },
-
     input: {
         borderWidth: 1,
         borderColor: "#d1d5db",
@@ -152,35 +152,30 @@ const styles = StyleSheet.create({
         marginBottom: 14,
         backgroundColor: "#f9fafb",
     },
-
     primaryButton: {
         backgroundColor: "#2563eb",
         paddingVertical: 16,
         borderRadius: 10,
         marginTop: 10,
     },
-
     primaryButtonText: {
         color: "#ffffff",
         fontSize: 16,
         fontWeight: "600",
         textAlign: "center",
     },
-
     googleButton: {
         backgroundColor: "#000000",
         paddingVertical: 16,
         borderRadius: 10,
         marginTop: 14,
     },
-
     googleButtonText: {
         color: "#ffffff",
         fontSize: 16,
         fontWeight: "600",
         textAlign: "center",
     },
-
     link: {
         marginTop: 20,
         textAlign: "center",

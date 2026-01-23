@@ -17,7 +17,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={isDark ? DarkThemeApp : LightTheme}>
-       <StatusBar
+      <StatusBar
         translucent={false}
         style={isDark ? 'light' : 'dark'}
         backgroundColor={isDark ? '#000000' : '#ffffff'}
@@ -27,6 +27,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="index" options={{ headerBackground: () => <HomeHeader />, headerShown: false }} />
           <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+          <Stack.Screen name='callback' options={{ headerShown: false }} />
         </Stack>
       </ProductProvider>
     </ThemeProvider>

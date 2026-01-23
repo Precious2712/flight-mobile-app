@@ -20,23 +20,6 @@ export default function SignupScreen() {
     const [loading, setLoading] = useState(false);
 
     const router = useRouter();
-
-    useEffect(() => {
-        const { data: listener } = supabase.auth.onAuthStateChange(
-            (event, session) => {
-                console.log("AUTH EVENT:", event);
-
-                if (event === "SIGNED_IN") {
-                    router.replace("/");
-                }
-            }
-        );
-
-        return () => {
-            listener.subscription.unsubscribe();
-        };
-    }, []);
-
     
     const handleSignup = async () => {
         if (!email || !password) {
