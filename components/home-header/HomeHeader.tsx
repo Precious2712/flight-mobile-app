@@ -4,24 +4,21 @@ import {
     StyleSheet,
     Pressable,
     Dimensions,
-    Button,
 } from 'react-native'
 import React, { useState } from 'react'
 import { IconSymbol } from '../ui/icon-symbol'
 import { useRouter } from 'expo-router'
-
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native'
+import { supabase } from '@/lib/superbase'
+import { DarkThemeApp } from '@/constants/navigation'
 
 const { height } = Dimensions.get('window')
 export const HEADER_HEIGHT = 60
 
-import { supabase } from "../../lib/superbase";
-
 export default function HomeHeader() {
     const [showMenu, setShowMenu] = useState(false)
     const router = useRouter()
-
-    const { colors } = useTheme();
+    const { colors } = useTheme()
 
     const handleNavigate = (label: string) => {
         setShowMenu(false)
@@ -39,23 +36,24 @@ export default function HomeHeader() {
             case 'Sign in':
                 router.push('/login')
                 break
-            case 'Logout':
-                break
             case 'Signup':
                 router.push('/signup')
+                break
+            case 'Home':
+                router.push('/')
                 break
         }
     }
 
-
     const handleLogout = async () => {
-        await supabase.auth.signOut();
-        router.replace("/login");
-    };
+        await supabase.auth.signOut()
+        router.replace('/login')
+    }
 
     return (
-        <>
-            <View style={[styles.headerBar, { backgroundColor: colors.background }]}>
+        <View style={styles.wrapper}>
+
+            <View style={[styles.headerBar, { backgroundColor: '#2563EB' }]}>
                 <Text style={[styles.title, { color: colors.text }]}>Home</Text>
 
                 <Pressable
@@ -70,16 +68,14 @@ export default function HomeHeader() {
                 </Pressable>
             </View>
 
+
             {showMenu && (
                 <View style={styles.overlay}>
-                    {['Profile', 'Bookings', 'Sign in', 'Dashboard', 'Signup'].map(item => (
+                    {['Profile', 'Bookings', 'Sign in', 'Dashboard', 'Signup', 'Home'].map(item => (
                         <Pressable
                             key={item}
                             onPress={() => handleNavigate(item)}
-                            style={({ hovered, pressed }) => [
-                                styles.item,
-                                (hovered || pressed) && styles.itemHover,
-                            ]}
+                            style={styles.item}
                         >
                             <Text style={styles.itemText}>{item}</Text>
                         </Pressable>
@@ -90,19 +86,17 @@ export default function HomeHeader() {
                     </Pressable>
                 </View>
             )}
-
-        </>
+        </View>
     )
 }
 
-
-
 const styles = StyleSheet.create({
+    wrapper: {
+        position: 'relative',
+        zIndex: 100,
+    },
+
     headerBar: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
         height: HEADER_HEIGHT,
         paddingHorizontal: 16,
         flexDirection: 'row',
@@ -110,8 +104,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
-        zIndex: 1000,
-        elevation: 10,
     },
 
     title: {
@@ -120,7 +112,10 @@ const styles = StyleSheet.create({
     },
 
     menuBtn: {
-        padding: 6,
+        padding: 2,
+        borderWidth: 3,
+        borderRadius: 10,
+        borderColor: 'white'
     },
 
     overlay: {
@@ -128,7 +123,8 @@ const styles = StyleSheet.create({
         top: HEADER_HEIGHT,
         left: 0,
         right: 0,
-        height: height - HEADER_HEIGHT,
+        bottom: 0,
+        height: height,
         backgroundColor: '#fff',
         paddingTop: 8,
         paddingHorizontal: 16,
@@ -142,10 +138,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#eee',
     },
 
-    itemHover: {
-        backgroundColor: '#f5f7fa', 
-    },
-
     itemText: {
         fontSize: 16,
         fontWeight: '500',
@@ -153,15 +145,16 @@ const styles = StyleSheet.create({
     },
 
     logoutBtn: {
-        backgroundColor: "#ef4444",
+        backgroundColor: 'gray',
         paddingVertical: 14,
         borderRadius: 10,
-        alignItems: "center",
+        alignItems: 'center',
         marginTop: 20,
     },
+
     logoutText: {
-        color: "#fff",
+        color: '#fff',
         fontSize: 16,
-        fontWeight: "600",
+        fontWeight: '600',
     },
 })

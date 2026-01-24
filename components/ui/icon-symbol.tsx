@@ -22,6 +22,13 @@ const MAPPING = {
 
   'mappin.and.ellipse': 'place',
   'calendar': 'calendar-today',
+
+  'bolt.fill': 'flash-on',
+  'shield.fill': 'shield',
+  'clock.fill': 'schedule',
+
+  'chart.line.uptrend.xyaxis': 'trending-up',
+  'star.fill': 'star',
 } as IconMapping;
 
 /**

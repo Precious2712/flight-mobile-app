@@ -1,142 +1,181 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
+import {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+    ReactNode,
+} from 'react'
 import { supabase } from '../lib/superbase'
+
+
+
+export type AirportOption = {
+    city: string
+    airportCode: string
+}
+
+export type Baggage = {
+    cabin: string
+    checked: string
+}
+
+export type CabinClass = {
+    type?: string
+    price?: number
+}
+
+export type Flight = {
+    id: string
+
+    airline: string
+    airline_code: string
+    flight_id: string
+    flight_number: string
+
+    from_airport: string
+    to_airport: string
+
+    departure_date: string
+    departure_time: string
+    arrival_time: string
+    duration: string
+
+    stops: number
+    status: 'AVAILABLE' | 'UNAVAILABLE'
+    refundable: boolean
+
+    baggage: Baggage
+    cabin_classes: CabinClass[][]
+
+    created_at: string
+}
+
+
 
 type ProductContextType = {
     from: string
     to: string
-    departureDate: string
-    returnDate: string
 
     setFrom: (v: string) => void
     setTo: (v: string) => void
-    setDepartureDate: (v: string) => void
-    setReturnDate: (v: string) => void
 
-    searchFlights: (field?: 'from' | 'to' | 'departure' | 'return_date') => Promise<void>
+    fromResults: AirportOption[]
+    toResults: AirportOption[]
+
+    finalResults: Flight[]   
+
     handleSubmit: () => Promise<void>
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined)
 
+
+
 export function ProductProvider({ children }: { children: ReactNode }) {
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
-    const [departureDate, setDepartureDate] = useState('')
-    const [returnDate, setReturnDate] = useState('')
 
-    const ilike = (column: string, value: string) => `${column}.ilike.%${value.trim()}%`
+    const [fromResults, setFromResults] = useState<AirportOption[]>([])
+    const [toResults, setToResults] = useState<AirportOption[]>([])
 
-
-    const searchFlights = async (
-        field?: 'from' | 'to' | 'departure' | 'return_date'
-    ) => {
-        let query = supabase
-            .from('flights')
-            .select('*')
-
-        if (from && (!field || field === 'from')) {
-            query = query.or(ilike('from_airport->>city', from))
-        }
-
-        if (to && (!field || field === 'to')) {
-            query = query.or(ilike('to_airport->>city', to))
-        }
-
-        if (departureDate && (!field || field === 'departure')) {
-            query = query.eq('departure_date', departureDate)
-        }
-
-        if (returnDate && (!field || field === 'departure')) {
-            query = query.eq('return_date', returnDate)
-        }
-
-        const { data, error } = await query
-
-        if (error) {
-            console.error('Live search error:', error.message)
-            return
-        }
-
-        console.log('Live results:', data)
-    }
-
-
-    const handleSubmit = async () => {
-        let query = supabase
-            .from('flights')
-            .select('*')
-        // .eq('status', 'AVAILABLE')
-
-        if (from) {
-            query = query.ilike(
-                'from_airport->>city',
-                `%${from.trim()}%`
-            )
-        }
-
-        if (to) {
-            query = query.ilike(
-                'to_airport->>city',
-                `%${to.trim()}%`
-            )
-        }
-
-        if (departureDate) {
-            query = query.eq('departure_date', departureDate)
-        }
-
-        if (returnDate) {
-            query = query.eq('departure_date', returnDate)
-        }
-
-        console.log('Final combined search…')
-
-        const { data, error } = await query
-
-        if (error) {
-            console.error('Search error:', error.message)
-            return
-        }
-
-        console.log('Final results:', data)
-    }
-
+    const [finalResults, setFinalResults] = useState<Flight[]>([]) 
 
 
     useEffect(() => {
-        const { data: listener } = supabase.auth.onAuthStateChange(
-            (event, session) => {
-                if (event === "SIGNED_IN" && session) {
-                    console.log("Access Token:", session.access_token);
-                    console.log("User ID:", session.user.id);
+        if (!from.trim()) {
+            setFromResults([])
+            return
+        }
+
+        const searchFrom = async () => {
+            const { data, error } = await supabase
+                .from('flights')
+                .select('from_airport')
+                .ilike('from_airport', `%${from}%`)
+
+            if (error || !data) return
+
+            const parsed: AirportOption[] = data.map(
+                (item: { from_airport: string }) => {
+                    const airport: AirportOption = JSON.parse(item.from_airport)
+
+                    return {
+                        city: airport.city,
+                        airportCode: airport.airportCode,
+                    }
                 }
+            )
 
-                if (event === "SIGNED_OUT") {
-                    console.log("User signed out");
+            console.log('PARSED FROM RESULTS:', parsed)
+            setFromResults(parsed)
+        }
+
+        searchFrom()
+    }, [from])
+
+    
+
+    useEffect(() => {
+        if (!to.trim()) {
+            setToResults([])
+            return
+        }
+
+        const searchTo = async () => {
+            const { data, error } = await supabase
+                .from('flights')
+                .select('to_airport')
+                .ilike('to_airport', `%${to}%`)
+
+            if (error || !data) return
+
+            const parsed: AirportOption[] = data.map(
+                (item: { to_airport: string }) => {
+                    const airport: AirportOption = JSON.parse(item.to_airport)
+
+                    return {
+                        city: airport.city,
+                        airportCode: airport.airportCode,
+                    }
                 }
-            }
-        );
+            )
 
-        return () => {
-            listener.subscription.unsubscribe();
-        };
-    }, []);
+            setToResults(parsed)
+        }
+
+        searchTo()
+    }, [to])
 
 
+    
+    const handleSubmit = async () => {
+        console.log('===== SUBMIT CLICKED =====')
+        console.log({ from, to })
 
+        const { data, error } = await supabase
+            .from('flights')
+            .select('*')
+            .ilike('from_airport', `%${from}%`)
+            .ilike('to_airport', `%${to}%`)
+
+        console.log('FINAL DATA:', data)
+        console.log('FINAL ERROR:', error)
+
+        if (!error && data) {
+            setFinalResults(data as Flight[]) 
+        }
+    }
 
     return (
         <ProductContext.Provider
             value={{
                 from,
                 to,
-                departureDate,
-                returnDate,
                 setFrom,
                 setTo,
-                setDepartureDate,
-                setReturnDate,
-                searchFlights,
+                fromResults,
+                toResults,
+                finalResults,     
                 handleSubmit,
             }}
         >
@@ -144,6 +183,8 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         </ProductContext.Provider>
     )
 }
+
+
 
 export function useProduct() {
     const context = useContext(ProductContext)

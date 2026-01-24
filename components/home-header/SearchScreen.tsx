@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { View, Text, StyleSheet, Alert } from 'react-native'
 import SearchFields from './search-field'
 import { TripType } from './search-field'
-import { FlightSearchData } from './search-field'
 
 export default function SearchScreen() {
     const [tripType, setTripType] = useState<TripType>('roundTrip')

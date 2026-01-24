@@ -14,9 +14,7 @@ import * as WebBrowser from "expo-web-browser";
 
 import { supabase } from "../../lib/superbase";
 
-/**
- * REQUIRED for OAuth redirect to complete
- */
+
 WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
@@ -33,7 +31,7 @@ export default function LoginScreen() {
                 const { data } = await supabase.auth.getSession();
 
                 if (data.session) {
-                    router.replace("/");
+                    router.push("/");
                 }
             }
         });
@@ -54,6 +52,8 @@ export default function LoginScreen() {
             password,
         });
 
+        router.push("/");
+
         setLoading(false);
 
         if (error) {
@@ -61,7 +61,6 @@ export default function LoginScreen() {
             return;
         }
 
-        router.replace("/");
     };
 
     const handleGoogleLogin = async () => {
@@ -81,6 +80,8 @@ export default function LoginScreen() {
 
         if (data?.url) {
             await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+            console.log('URL_API', data.url);
+            
         }
     };
 
@@ -145,12 +146,12 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        borderColor: "#d1d5db",
+        // borderColor: "#d1d5db",
         borderRadius: 10,
         padding: 14,
         fontSize: 16,
         marginBottom: 14,
-        backgroundColor: "#f9fafb",
+        // backgroundColor: "#f9fafb",
     },
     primaryButton: {
         backgroundColor: "#2563eb",

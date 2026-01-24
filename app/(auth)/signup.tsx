@@ -72,6 +72,9 @@ export default function SignupScreen() {
                 redirectTo
             );
         }
+
+        console.log('SIGNUP_URL_CALL_BACK_URL', redirectTo, data.url);
+        
     };
 
     return (
