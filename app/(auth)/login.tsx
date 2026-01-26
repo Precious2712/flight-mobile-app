@@ -22,6 +22,9 @@ export default function LoginScreen() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [focused, setFocused] = useState<'email' | 'password' | null>(null)
+
+
     const router = useRouter();
 
 
@@ -81,7 +84,7 @@ export default function LoginScreen() {
         if (data?.url) {
             await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
             console.log('URL_API', data.url);
-            
+
         }
     };
 
@@ -95,7 +98,15 @@ export default function LoginScreen() {
                 onChangeText={setEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
-                style={styles.input}
+                autoComplete="off"
+                //   textContentType="none"
+                //   importantForAutofill="no"
+                onFocus={() => setFocused('password')}
+                onBlur={() => setFocused(null)}
+                style={[
+                    styles.input,
+                    focused === 'password' && styles.focusRing,
+                ]}
             />
 
             <TextInput
@@ -103,7 +114,15 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
-                style={styles.input}
+                autoComplete="off"
+                // textContentType="none"
+                // importantForAutofill="no"
+                onFocus={() => setFocused('password')}
+                onBlur={() => setFocused(null)}
+                style={[
+                    styles.input,
+                    focused === 'password' && styles.focusRing,
+                ]}
             />
 
             <TouchableOpacity
@@ -146,13 +165,28 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        // borderColor: "#d1d5db",
         borderRadius: 10,
         padding: 14,
         fontSize: 16,
         marginBottom: 14,
-        // backgroundColor: "#f9fafb",
+        backgroundColor: '#ffffff',
     },
+
+    focusRing: {
+        borderColor: '#2563eb',
+        borderWidth: 2,
+
+        // iOS ring
+        shadowColor: '#2563eb',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.35,
+        shadowRadius: 6,
+
+        // Android ring
+        elevation: 4,
+    },
+
+
     primaryButton: {
         backgroundColor: "#2563eb",
         paddingVertical: 16,

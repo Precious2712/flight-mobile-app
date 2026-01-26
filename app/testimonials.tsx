@@ -84,6 +84,10 @@ const styles = StyleSheet.create({
         paddingVertical: 24,
         paddingHorizontal: 16,
         backgroundColor: '#F9FAFB',
+        borderRadius: 10,
+        width: '95%',
+        flexDirection: 'column',
+        alignSelf: 'center',
     },
     header: {
         alignItems: 'center',

@@ -58,7 +58,7 @@ export default function FeaturesSection() {
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 10,
         paddingVertical: 24,
     },
 

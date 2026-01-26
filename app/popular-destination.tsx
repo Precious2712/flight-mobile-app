@@ -66,8 +66,8 @@ export default function PopularDestinations() {
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 24,
-        paddingHorizontal: 16,
+        paddingVertical: 20,
+        paddingHorizontal: 10,
     },
     header: {
         alignItems: 'center',

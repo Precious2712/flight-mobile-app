@@ -17,6 +17,8 @@ import { useProduct } from '@/context/useContext'
 import FeaturesSection from './feature-section'
 import PopularDestinations from './popular-destination'
 import Testimonials from './testimonials'
+import FAQSection from './faq-sections'
+import Footer from './footer'
 
 export default function Index() {
     const { finalResults } = useProduct()
@@ -72,6 +74,8 @@ export default function Index() {
                 <FeaturesSection />
                 <PopularDestinations />
                 <Testimonials />
+                <FAQSection />
+                <Footer />
             </ScrollView>
 
             <Modal visible={open} animationType="slide" transparent>
