@@ -5,7 +5,7 @@ export default function AuthCallback() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/");
+    router.push("/");
   }, []);
 
   return null;

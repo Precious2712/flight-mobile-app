@@ -7,8 +7,9 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native'
-import { IconSymbol } from '@/components/ui/icon-symbol'
-import { useProduct } from '@/context/useContext'
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useProduct } from '@/context/useContext';
+import { ActivityIndicator } from 'react-native';
 
 export type TripType = 'oneWay' | 'roundTrip'
 
@@ -17,6 +18,7 @@ interface SearchFieldsProps {
 }
 
 export default function SearchFields({ tripType }: SearchFieldsProps) {
+
   const {
     from,
     setFrom,
@@ -29,11 +31,12 @@ export default function SearchFields({ tripType }: SearchFieldsProps) {
     fromResults,
     toResults,
     handleSubmit,
+    searchLoading
   } = useProduct()
 
   return (
     <View style={styles.form}>
-      {/* FROM */}
+
       <Input
         label="From"
         value={from}
@@ -41,20 +44,29 @@ export default function SearchFields({ tripType }: SearchFieldsProps) {
         placeholder="Departure city"
         iconName="mappin.and.ellipse"
       >
-        <ScrollView>
-          {fromResults.map((item, index) => (
-            <Text
-              key={index}
-              style={styles.dropdownItem}
-              onPress={() => setFrom(item.city)}
-            >
-              {item.city} ({item.airportCode})
-            </Text>
-          ))}
-        </ScrollView>
+        {({ close }: { close: () => void }) => (
+          <ScrollView
+            // style={{ maxHeight: 240 }}
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled
+          >
+            {fromResults.map((item, index) => (
+              <Text
+                key={index}
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setFrom(item.city)
+                  close()
+                }}
+              >
+                {item.city} ({item.airportCode})
+              </Text>
+            ))}
+          </ScrollView>
+        )}
       </Input>
 
-      {/* TO */}
+
       <Input
         label="To"
         value={to}
@@ -62,17 +74,27 @@ export default function SearchFields({ tripType }: SearchFieldsProps) {
         placeholder="Arrival city"
         iconName="mappin.and.ellipse"
       >
-        <ScrollView>
-          {toResults.map((item, index) => (
-            <Text
-              key={index}
-              style={styles.dropdownItem}
-              onPress={() => setTo(item.city)}
-            >
-              {item.city} ({item.airportCode})
-            </Text>
-          ))}
-        </ScrollView>
+
+        {({ close }: { close: () => void }) => (
+          <ScrollView
+            // style={{ maxHeight: 240 }}
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled
+          >
+            {toResults.map((item, index) => (
+              <Text
+                key={index}
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setTo(item.city)
+                  close()
+                }}
+              >
+                {item.city} ({item.airportCode})
+              </Text>
+            ))}
+          </ScrollView>
+        )}
       </Input>
 
       {/* DEPART */}
@@ -95,14 +117,26 @@ export default function SearchFields({ tripType }: SearchFieldsProps) {
         />
       )} */}
 
-      <Pressable style={styles.searchButton} onPress={handleSubmit}>
-        <Text style={styles.searchText}>Search Flights</Text>
+      <Pressable
+        style={[
+          styles.searchButton,
+          searchLoading && { opacity: 0.7 },
+        ]}
+        onPress={handleSubmit}
+        disabled={searchLoading}
+      >
+        {searchLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.searchText}>Search Flights</Text>
+        )}
       </Pressable>
+
     </View>
   )
 }
 
-/* ================= INPUT ================= */
+
 
 function Input({
   label,
@@ -114,8 +148,7 @@ function Input({
 }: any) {
   const [focused, setFocused] = useState(false)
 
-  const showDropdown =
-    focused && value?.length > 0 && React.Children.count(children) > 0
+  const showDropdown = focused && value?.length > 0
 
   return (
     <View style={styles.inputGroup}>
@@ -130,18 +163,19 @@ function Input({
           placeholderTextColor="#9CA3AF"
           style={styles.input}
           onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
         />
       </View>
 
       {showDropdown && (
-        <View style={styles.dropdownContainer}>{children}</View>
+        <View style={styles.dropdownContainer}>
+          {children({ close: () => setFocused(false) })}
+        </View>
       )}
     </View>
   )
 }
 
-/* ================= STYLES ================= */
+
 
 const styles = StyleSheet.create({
   form: {
@@ -174,7 +208,7 @@ const styles = StyleSheet.create({
   input: { flex: 1, fontSize: 14 },
 
   dropdownContainer: {
-    maxHeight: 140, // ✅ FIXED HEIGHT
+    maxHeight: 240,
     marginTop: 6,
     borderWidth: 1,
     borderColor: '#E5E7EB',

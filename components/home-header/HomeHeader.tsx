@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router'
 import { supabase } from '@/lib/superbase'
 import { DarkThemeApp, LightTheme } from '@/constants/navigation'
 import { useColorScheme } from '@/hooks/use-color-scheme'
+import { useProduct } from '@/context/useContext'
 
 const { height } = Dimensions.get('window')
 export const HEADER_HEIGHT = 60
@@ -19,6 +20,8 @@ export const HEADER_HEIGHT = 60
 export default function HomeHeader() {
     const [showMenu, setShowMenu] = useState(false)
     const router = useRouter()
+
+    const {user, handleLogout} = useProduct();
 
     const scheme = useColorScheme()
     const theme = scheme === 'dark' ? DarkThemeApp : LightTheme
@@ -49,10 +52,6 @@ export default function HomeHeader() {
         }
     }
 
-    const handleLogout = async () => {
-        await supabase.auth.signOut()
-        router.push('/login')
-    }
 
     return (
         <View style={styles.wrapper}>
@@ -66,7 +65,7 @@ export default function HomeHeader() {
                 ]}
             >
                 <Text style={[styles.title, { color: colors.text }]}>
-                    Home
+                    {user ? `${user.email}` : 'Hi Guest'}
                 </Text>
 
                 <Pressable
@@ -131,7 +130,7 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        fontSize: 18,
+        fontSize: 12,
         fontWeight: '600',
     },
 

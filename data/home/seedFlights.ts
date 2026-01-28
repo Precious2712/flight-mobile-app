@@ -8,16 +8,16 @@ export const seedFlights = async () => {
         airline_code: flight.airlineCode,
         flight_number: flight.flightNumber,
 
-        from_airport: flight.from, // JSON
-        to_airport: flight.to,     // JSON
+        from_airport: flight.from, 
+        to_airport: flight.to,     
 
         departure_date: flight.departureDate,
         departure_time: flight.departureTime,
         arrival_time: flight.arrivalTime,
         duration: flight.duration,
 
-        cabin_classes: flight.cabinClasses, // JSON
-        baggage: flight.baggage,             // JSON
+        cabin_classes: flight.cabinClasses, 
+        baggage: flight.baggage,             
 
         refundable: flight.refundable,
         stops: flight.stops,

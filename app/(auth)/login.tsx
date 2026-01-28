@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
+import Toast from 'react-native-toast-message';
 
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
@@ -29,42 +30,60 @@ export default function LoginScreen() {
 
 
     useEffect(() => {
-        const subscription = Linking.addEventListener("url", async ({ url }) => {
-            if (url.includes("auth/callback")) {
-                const { data } = await supabase.auth.getSession();
-
-                if (data.session) {
+        const { data: authListener } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                if (session) {
                     router.push("/");
                 }
             }
-        });
+        );
 
-        return () => subscription.remove();
+        return () => {
+            authListener.subscription.unsubscribe();
+        };
     }, []);
+
 
     const handleLogin = async () => {
         if (!email || !password) {
-            Alert.alert("Error", "Email and password are required");
-            return;
+            Toast.show({
+                type: 'info',
+                text1: 'Email and password are required',
+            })
+            return
         }
 
-        setLoading(true);
+        setLoading(true)
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            })
 
-        router.push("/");
+            if (error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Login failed',
+                    text2: error.message,
+                })
+                return
+            }
 
-        setLoading(false);
+            if (data?.session) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Login successful 🎉',
+                })
 
-        if (error) {
-            Alert.alert("Login failed", error.message);
-            return;
+                router.replace('/');
+            }
+        } finally {
+            setLoading(false)
         }
+    }
 
-    };
+
 
     const handleGoogleLogin = async () => {
         const redirectTo = Linking.createURL("auth/callback");
@@ -82,11 +101,17 @@ export default function LoginScreen() {
         }
 
         if (data?.url) {
-            await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
-            console.log('URL_API', data.url);
-
+            await WebBrowser.openAuthSessionAsync(
+                data.url,
+                redirectTo
+            );
         }
+
+        console.log('DATA_URL', data.url);
+        console.log(redirectTo, 'REDIRECT_URL');
+
     };
+
 
     return (
         <View style={styles.container}>
@@ -101,11 +126,11 @@ export default function LoginScreen() {
                 autoComplete="off"
                 //   textContentType="none"
                 //   importantForAutofill="no"
-                onFocus={() => setFocused('password')}
+                onFocus={() => setFocused('email')}
                 onBlur={() => setFocused(null)}
                 style={[
                     styles.input,
-                    focused === 'password' && styles.focusRing,
+                    focused === 'email' && styles.focusRing,
                 ]}
             />
 

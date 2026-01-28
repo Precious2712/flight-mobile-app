@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import 'react-native-reanimated'
+import Toast from 'react-native-toast-message'
 
 import { useColorScheme } from '@/hooks/use-color-scheme'
 import { ProductProvider } from '@/context/useContext'
@@ -29,9 +30,13 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="callback" options={{ headerShown: false }} />
+          <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
+
+          <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
         </Stack>
       </ProductProvider>
+
+      <Toast />
     </>
   )
 }

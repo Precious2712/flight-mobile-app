@@ -14,16 +14,23 @@ import HomeHeader from '@/components/home-header/HomeHeader'
 import HeroSection from '@/components/home-header/hero-section'
 import SearchScreen from '@/components/home-header/SearchScreen'
 import { useProduct } from '@/context/useContext'
-import FeaturesSection from './feature-section'
-import PopularDestinations from './popular-destination'
-import Testimonials from './testimonials'
-import FAQSection from './faq-sections'
-import Footer from './footer'
+import FeaturesSection from '../components/home-header/feature-section'
+import PopularDestinations from '../components/home-header/popular-destination'
+import Testimonials from '../components/home-header/testimonials'
+import FAQSection from '../components/home-header/faq-sections'
+import Footer from '../components/home-header/footer'
+import { useRouter } from 'expo-router'
+
 
 export default function Index() {
-    const { finalResults } = useProduct()
-    const [open, setOpen] = useState(false)
+    const { finalResults } = useProduct();
+    const [open, setOpen] = useState(false);
 
+    const router = useRouter();
+
+    const handleBook = () => {
+        router.push('/over-view')
+    }
 
     useEffect(() => {
         if (finalResults.length > 0) {
@@ -170,6 +177,10 @@ export default function Index() {
                                     <Text style={styles.meta}>
                                         Created At: {flight.created_at}
                                     </Text>
+
+                                    <Pressable onPress={handleBook} style={styles.searchButton}>
+                                        <Text>Click</Text>
+                                    </Pressable>
                                 </View>
                             )
                         })}
@@ -257,5 +268,12 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: '600',
+    },
+    searchButton: {
+        marginTop: 10,
+        backgroundColor: '#25eb99',
+        padding: 14,
+        borderRadius: 16,
+        alignItems: 'center',
     },
 })

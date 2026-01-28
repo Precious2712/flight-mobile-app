@@ -14,41 +14,71 @@ import * as Linking from "expo-linking";
 
 import { supabase } from "../../lib/superbase";
 
+import Toast from 'react-native-toast-message';
+
 export default function SignupScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
     const router = useRouter();
-    
+
+    useEffect(() => {
+        const { data: authListener } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                if (session) {
+                    router.push("/");
+                }
+            }
+        );
+
+        return () => {
+            authListener.subscription.unsubscribe();
+        };
+    }, []);
+
+
     const handleSignup = async () => {
         if (!email || !password) {
-            Alert.alert("Error", "Email and password are required");
-            return;
+            Toast.show({
+                type: 'info',
+                text1: 'Email and password are required',
+            })
+            return
         }
 
-        setLoading(true);
+        setLoading(true)
 
-        const { error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                emailRedirectTo: "flightapp://auth/callback",
-            },
-        });
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: 'flightapp://auth/callback',
+                },
+            })
 
-        setLoading(false);
+            if (error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Signup failed',
+                    text2: error.message,
+                })
+                return
+            }
 
-        if (error) {
-            Alert.alert("Signup failed", error.message);
-            return;
+            
+            if (data?.user) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Account created 🎉',
+                    text2: 'Check your email to verify your account',
+                })
+            }
+        } finally {
+            setLoading(false)
         }
-
-        Alert.alert(
-            "Verify your email",
-            "A verification link has been sent to your email."
-        );
-    };
+    }
 
 
     const handleGoogleLogin = async () => {
@@ -73,8 +103,9 @@ export default function SignupScreen() {
             );
         }
 
-        console.log('SIGNUP_URL_CALL_BACK_URL', redirectTo, data.url);
-        
+        console.log('DATA_URL', data.url);
+        console.log(redirectTo, 'REDIRECT_URL');
+
     };
 
     return (
