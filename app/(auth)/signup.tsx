@@ -54,7 +54,7 @@ export default function SignupScreen() {
                 email,
                 password,
                 options: {
-                    emailRedirectTo: 'flightapp://auth/callback',
+                    emailRedirectTo: 'exp://192.168.1.64:8081/--/login',
                 },
             })
 
@@ -67,7 +67,7 @@ export default function SignupScreen() {
                 return
             }
 
-            
+
             if (data?.user) {
                 Toast.show({
                     type: 'success',
@@ -86,9 +86,7 @@ export default function SignupScreen() {
 
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: "google",
-            options: {
-                redirectTo,
-            },
+            options: { redirectTo },
         });
 
         if (error) {
@@ -102,11 +100,9 @@ export default function SignupScreen() {
                 redirectTo
             );
         }
-
-        console.log('DATA_URL', data.url);
-        console.log(redirectTo, 'REDIRECT_URL');
-
     };
+
+
 
     return (
         <View style={styles.container}>

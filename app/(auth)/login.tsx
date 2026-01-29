@@ -90,9 +90,7 @@ export default function LoginScreen() {
 
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: "google",
-            options: {
-                redirectTo,
-            },
+            options: { redirectTo },
         });
 
         if (error) {
@@ -106,11 +104,9 @@ export default function LoginScreen() {
                 redirectTo
             );
         }
-
-        console.log('DATA_URL', data.url);
-        console.log(redirectTo, 'REDIRECT_URL');
-
     };
+
+
 
 
     return (
