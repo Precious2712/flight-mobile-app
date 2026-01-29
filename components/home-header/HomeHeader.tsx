@@ -21,7 +21,7 @@ export default function HomeHeader() {
     const [showMenu, setShowMenu] = useState(false)
     const router = useRouter()
 
-    const {user, handleLogout} = useProduct();
+    const { user, handleLogout, authLoading } = useProduct();
 
     const scheme = useColorScheme()
     const theme = scheme === 'dark' ? DarkThemeApp : LightTheme
@@ -65,8 +65,13 @@ export default function HomeHeader() {
                 ]}
             >
                 <Text style={[styles.title, { color: colors.text }]}>
-                    {user ? `${user.email}` : 'Hi Guest'}
+                    {authLoading
+                        ? 'Loading...'
+                        : user
+                            ? `Hi ${user.user_metadata?.full_name ?? user.email}`
+                            : 'Hi Guest'}
                 </Text>
+
 
                 <Pressable
                     onPress={() => setShowMenu(prev => !prev)}
@@ -93,7 +98,7 @@ export default function HomeHeader() {
                     {['Profile', 'Bookings', 'Sign in', 'Dashboard', 'Signup', 'Home'].map(item => (
                         <Pressable
                             key={item}
-                            onPress={() => handleNavigate(item)} 
+                            onPress={() => handleNavigate(item)}
                             style={styles.item}
                         >
                             <Text style={[styles.itemText, { color: colors.text }]}>
@@ -104,7 +109,7 @@ export default function HomeHeader() {
 
                     <Pressable
                         style={styles.logoutBtn}
-                        onPress={handleLogout} 
+                        onPress={handleLogout}
                     >
                         <Text style={styles.logoutText}>Logout</Text>
                     </Pressable>

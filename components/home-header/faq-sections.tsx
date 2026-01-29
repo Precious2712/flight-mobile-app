@@ -65,7 +65,7 @@ export default function FAQSection() {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={[styles.title, {color: colors.text}]}>Frequently Asked Questions</Text>
+                <Text style={[styles.title]}>Frequently Asked Questions</Text>
                 <Text style={styles.subtitle}>
                     Find answers to common questions about booking and traveling with SkyWings
                 </Text>
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         fontSize: 23,
         fontWeight: '700',
         marginBottom: 8,
-        // color: '#111827',
+        color: '#111827',
         textAlign: 'center',
     },
 

@@ -5,7 +5,7 @@ export default function Footer() {
     return (
         <View style={styles.container}>
            
-            <Text style={styles.logo}>SkyWings</Text>
+            <Text style={styles.logo}>Airswift</Text>
 
             <Text style={styles.description}>
                 Book flights with confidence. Fast, secure, and reliable travel
@@ -33,7 +33,7 @@ export default function Footer() {
 
             
             <Text style={styles.copy}>
-                © {new Date().getFullYear()} SkyWings. All rights reserved.
+                © {new Date().getFullYear()} Airswift. All rights reserved.
             </Text>
         </View>
     )

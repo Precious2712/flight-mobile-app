@@ -51,17 +51,29 @@ export default function Overview() {
                 .select()
                 .single()
 
+            console.log(data, 'data');
+
+
             if (error) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Booking failed',
-                    text2: error.message,
-                })
+                if (error.message.includes('unique_user_flight')) {
+                    Toast.show({
+                        type: 'info',
+                        text1: 'Already booked',
+                        text2: 'You already booked this flight ✈️',
+                    })
+                } else {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Booking failed',
+                        text2: error.message,
+                    })
+                }
                 return
             }
 
-            console.log(error);
-            
+
+            console.log(error, 'error');
+
 
             Toast.show({
                 type: 'success',

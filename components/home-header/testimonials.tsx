@@ -40,7 +40,7 @@ export default function Testimonials() {
             <View style={styles.header}>
                 <Text style={styles.title}>What Our Customers Say</Text>
                 <Text style={styles.subtitle}>
-                    Join thousands of happy travelers who trust SkyWings
+                    Join thousands of happy travelers who trust Airswift
                 </Text>
             </View>
 

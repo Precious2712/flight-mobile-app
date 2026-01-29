@@ -5,10 +5,10 @@ import {
     useEffect,
     ReactNode,
 } from 'react'
-
-import { supabase } from '../lib/superbase';
-import { User } from '@supabase/supabase-js';
-import { useRouter } from "expo-router";
+import { supabase } from '../lib/superbase'
+import { User } from '@supabase/supabase-js'
+import { useRouter } from 'expo-router'
+import Toast from 'react-native-toast-message'
 
 export type AirportOption = {
     city: string
@@ -26,78 +26,79 @@ export type CabinClass = {
 }
 
 export type Flight = {
-    id: string;
-
-    airline: string;
-    airline_code: string;
-    flight_id: string;
-    flight_number: string;
-
-    from_airport: string;
-    to_airport: string;
-
-    departure_date: string;
-    departure_time: string;
-    arrival_time: string;
-    duration: string;
-
-    stops: number;
-    status: 'AVAILABLE' | 'UNAVAILABLE';
-    refundable: boolean;
-
-    baggage: Baggage;
-    cabin_classes: CabinClass[][];
-
-    created_at: string;
+    id: string
+    airline: string
+    airline_code: string
+    flight_id: string
+    flight_number: string
+    from_airport: string
+    to_airport: string
+    departure_date: string
+    departure_time: string
+    arrival_time: string
+    duration: string
+    stops: number
+    status: 'AVAILABLE' | 'UNAVAILABLE'
+    refundable: boolean
+    baggage: Baggage
+    cabin_classes: CabinClass[][]
+    created_at: string
 }
-
 
 type ProductContextType = {
-    from: string;
-    to: string;
+    from: string
+    to: string
+    setFrom: (v: string) => void
+    setTo: (v: string) => void
 
-    setFrom: (v: string) => void;
-    setTo: (v: string) => void;
+    fromResults: AirportOption[]
+    toResults: AirportOption[]
 
-    fromResults: AirportOption[];
-    toResults: AirportOption[];
-    searchLoading: boolean;
+    fromSelected: boolean
+    toSelected: boolean
+    setFromSelected: (v: boolean) => void
+    setToSelected: (v: boolean) => void
 
-    finalResults: Flight[];
+    finalResults: Flight[]
+    searchLoading: boolean
 
-    user: User | null;
-    authLoading: boolean;
-    handleLogout: () => Promise<void>;
-
-    handleSubmit: () => Promise<void>;
+    user: User | null
+    authLoading: boolean
+    handleLogout: () => Promise<void>
+    handleSubmit: () => Promise<void>
 }
 
-const ProductContext = createContext<ProductContextType | undefined>(undefined);
-
+const ProductContext = createContext<ProductContextType | undefined>(undefined)
 
 export function ProductProvider({ children }: { children: ReactNode }) {
-    const [from, setFrom] = useState('');
-    const [to, setTo] = useState('');
+    const [from, setFrom] = useState('')
+    const [to, setTo] = useState('')
 
-    const [fromResults, setFromResults] = useState<AirportOption[]>([]);
-    const [toResults, setToResults] = useState<AirportOption[]>([]);
-    const [searchLoading, setSearchLoading] = useState(false);
+    const [fromResults, setFromResults] = useState<AirportOption[]>([])
+    const [toResults, setToResults] = useState<AirportOption[]>([])
 
-    const [finalResults, setFinalResults] = useState<Flight[]>([]);
+    const [fromSelected, setFromSelected] = useState(false)
+    const [toSelected, setToSelected] = useState(false)
 
-    const [user, setUser] = useState<User | null>(null);
-    const [authLoading, setAuthLoading] = useState(true);
+    const [finalResults, setFinalResults] = useState<Flight[]>([])
+    const [searchLoading, setSearchLoading] = useState(false)
 
-    const router = useRouter();
+    const [user, setUser] = useState<User | null>(null)
+    const [authLoading, setAuthLoading] = useState(true)
 
+    const router = useRouter()
 
+    // ================= FROM SEARCH (DEBOUNCED) =================
     useEffect(() => {
         if (!from.trim()) {
             setFromResults([])
+            setFromSelected(false)
             return
         }
 
-        const searchFrom = async () => {
+        setFromSelected(false)
+
+        const timeout = setTimeout(async () => {
             const { data, error } = await supabase
                 .from('flights')
                 .select('from_airport')
@@ -105,33 +106,33 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
             if (error || !data) return
 
-            const parsed: AirportOption[] = data.map(
-                (item: { from_airport: string }) => {
-                    const airport: AirportOption = JSON.parse(item.from_airport)
+            const map = new Map<string, AirportOption>()
 
-                    return {
-                        city: airport.city,
-                        airportCode: airport.airportCode,
-                    }
-                }
-            )
+            data.forEach((item: { from_airport: string }) => {
+                const airport = JSON.parse(item.from_airport)
+                map.set(airport.airportCode, {
+                    city: airport.city,
+                    airportCode: airport.airportCode,
+                })
+            })
 
-            console.log('PARSED FROM RESULTS:', parsed)
-            setFromResults(parsed)
-        }
+            setFromResults(Array.from(map.values()))
+        }, 300)
 
-        searchFrom()
+        return () => clearTimeout(timeout)
     }, [from])
 
-
-
+    // ================= TO SEARCH (DEBOUNCED) =================
     useEffect(() => {
         if (!to.trim()) {
             setToResults([])
+            setToSelected(false)
             return
         }
 
-        const searchTo = async () => {
+        setToSelected(false)
+
+        const timeout = setTimeout(async () => {
             const { data, error } = await supabase
                 .from('flights')
                 .select('to_airport')
@@ -139,27 +140,31 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
             if (error || !data) return
 
-            const parsed: AirportOption[] = data.map(
-                (item: { to_airport: string }) => {
-                    const airport: AirportOption = JSON.parse(item.to_airport);
+            const map = new Map<string, AirportOption>()
 
-                    return {
-                        city: airport.city,
-                        airportCode: airport.airportCode,
-                    }
-                }
-            )
+            data.forEach((item: { to_airport: string }) => {
+                const airport = JSON.parse(item.to_airport)
+                map.set(airport.airportCode, {
+                    city: airport.city,
+                    airportCode: airport.airportCode,
+                })
+            })
 
-            setToResults(parsed);
-        }
+            setToResults(Array.from(map.values()))
+        }, 300)
 
-        searchTo()
+        return () => clearTimeout(timeout)
     }, [to])
 
-
-
+    // ================= SEARCH FLIGHTS =================
     const handleSubmit = async () => {
-        if (!from || !to) return
+        if (!from || !to) {
+            Toast.show({
+                type: 'error',
+                text1: 'From and To are required'
+            })
+            return
+        }
 
         setSearchLoading(true)
 
@@ -167,70 +172,40 @@ export function ProductProvider({ children }: { children: ReactNode }) {
             const { data, error } = await supabase
                 .from('flights')
                 .select('*')
-                .ilike('from_airport', `%${from}%`)
-                .ilike('to_airport', `%${to}%`)
+                .or(
+                    `from_airport.ilike.%${from}%,to_airport.ilike.%${to}%`
+                )
 
-            if (!error && data) {
-                setFinalResults(data as Flight[])
-            }
+            setFinalResults((data as Flight[]) ?? [])
+
+            console.log(data)
         } finally {
             setSearchLoading(false)
         }
     }
 
-
-
+    // ================= AUTH =================
     useEffect(() => {
-        const loadUser = async () => {
-            try {
-                const { data, error } = await supabase.auth.getSession();
-
-                if (error) throw error
-
-                setUser(data.session?.user ?? null);
-
-                console.log('USER', user);
-
-            } catch (err) {
-                console.log('Auth error:', err);
-                setUser(null)
-            } finally {
-                setAuthLoading(false);
-            }
+        const loadSession = async () => {
+            const { data } = await supabase.auth.getSession()
+            setUser(data.session?.user ?? null)
+            setAuthLoading(false)
         }
 
-        loadUser()
+        loadSession()
 
-        try {
-            const { data: listener } = supabase.auth.onAuthStateChange(
-                (_event, session) => {
-                    setUser(session?.user ?? null);
-                }
-            )
+        const { data: listener } = supabase.auth.onAuthStateChange(
+            (_event, session) => setUser(session?.user ?? null)
+        )
 
-            return () => {
-                listener.subscription.unsubscribe();
-            }
-        } catch (err) {
-            console.log('Auth listener error:', err);
-        }
+        return () => listener.subscription.unsubscribe()
     }, [])
 
-
     const handleLogout = async () => {
-        try {
-            const { error } = await supabase.auth.signOut();
-            if (error) throw error;
-
-            setUser(null);
-            router.push('/login');
-        } catch (err) {
-            console.log('Logout error:', err);
-        }
+        await supabase.auth.signOut()
+        setUser(null)
+        router.push('/login')
     }
-
-
-
 
     return (
         <ProductContext.Provider
@@ -241,20 +216,22 @@ export function ProductProvider({ children }: { children: ReactNode }) {
                 setTo,
                 fromResults,
                 toResults,
+                fromSelected,
+                toSelected,
+                setFromSelected,
+                setToSelected,
                 finalResults,
                 handleSubmit,
+                searchLoading,
                 user,
                 authLoading,
                 handleLogout,
-                searchLoading,
             }}
         >
             {children}
         </ProductContext.Provider>
     )
 }
-
-
 
 export function useProduct() {
     const context = useContext(ProductContext)

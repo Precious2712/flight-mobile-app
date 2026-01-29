@@ -6,7 +6,7 @@ import {
     StyleSheet,
     Alert,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "expo-router";
 import Toast from 'react-native-toast-message';
 
@@ -29,19 +29,19 @@ export default function LoginScreen() {
     const router = useRouter();
 
 
-    useEffect(() => {
-        const { data: authListener } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                if (session) {
-                    router.push("/");
-                }
-            }
-        );
+    // useEffect(() => {
+    //     const { data: authListener } = supabase.auth.onAuthStateChange(
+    //         (_event, session) => {
+    //             if (session) {
+    //                 router.push("/");
+    //             }
+    //         }
+    //     );
 
-        return () => {
-            authListener.subscription.unsubscribe();
-        };
-    }, []);
+    //     return () => {
+    //         authListener.subscription.unsubscribe();
+    //     };
+    // }, []);
 
 
     const handleLogin = async () => {
