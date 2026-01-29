@@ -1,14 +1,14 @@
-import {
-    createContext,
-    useContext,
-    useState,
-    useEffect,
-    ReactNode,
-} from 'react'
-import { supabase } from '../lib/superbase'
 import { User } from '@supabase/supabase-js'
 import { useRouter } from 'expo-router'
+import {
+    ReactNode,
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+} from 'react'
 import Toast from 'react-native-toast-message'
+import { supabase } from '../lib/superbase'
 
 export type AirportOption = {
     city: string
@@ -88,7 +88,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
     const router = useRouter()
 
-    // ================= FROM SEARCH (DEBOUNCED) =================
+    
     useEffect(() => {
         if (!from.trim()) {
             setFromResults([])
@@ -122,7 +122,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         return () => clearTimeout(timeout)
     }, [from])
 
-    // ================= TO SEARCH (DEBOUNCED) =================
+    
     useEffect(() => {
         if (!to.trim()) {
             setToResults([])
@@ -156,7 +156,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         return () => clearTimeout(timeout)
     }, [to])
 
-    // ================= SEARCH FLIGHTS =================
+    
     const handleSubmit = async () => {
         if (!from || !to) {
             Toast.show({
@@ -184,7 +184,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         }
     }
 
-    // ================= AUTH =================
+   
     useEffect(() => {
         const loadSession = async () => {
             const { data } = await supabase.auth.getSession()

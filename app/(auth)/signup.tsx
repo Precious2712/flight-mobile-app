@@ -1,20 +1,23 @@
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
-    View,
+    Alert,
+    Keyboard,
+    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    StyleSheet,
-    Alert,
+    View,
 } from "react-native";
-import { useState } from "react";
-import { useRouter } from "expo-router";
 
-import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
 
 import { supabase } from "../../lib/superbase";
 
+import { TouchableWithoutFeedback } from "react-native";
 import Toast from 'react-native-toast-message';
+
 
 export default function SignupScreen() {
     const [email, setEmail] = useState("");
@@ -22,20 +25,6 @@ export default function SignupScreen() {
     const [loading, setLoading] = useState(false);
 
     const router = useRouter();
-
-    // useEffect(() => {
-    //     const { data: authListener } = supabase.auth.onAuthStateChange(
-    //         (_event, session) => {
-    //             if (session) {
-    //                 router.push("/");
-    //             }
-    //         }
-    //     );
-
-    //     return () => {
-    //         authListener.subscription.unsubscribe();
-    //     };
-    // }, []);
 
 
     const handleSignup = async () => {
@@ -103,49 +92,50 @@ export default function SignupScreen() {
     };
 
 
-
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Create Account</Text>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.container}>
+                <Text style={styles.title}>Create Account</Text>
 
-            <TextInput
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                style={styles.input}
-            />
+                <TextInput
+                    placeholder="Email"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                    style={styles.input}
+                />
 
-            <TextInput
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                style={styles.input}
-            />
+                <TextInput
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    style={styles.input}
+                />
 
-            <TouchableOpacity
-                onPress={handleSignup}
-                style={styles.primaryButton}
-                disabled={loading}
-            >
-                <Text style={styles.primaryButtonText}>
-                    {loading ? "Signing up..." : "Sign Up"}
-                </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleSignup}
+                    style={styles.primaryButton}
+                    disabled={loading}
+                >
+                    <Text style={styles.primaryButtonText}>
+                        {loading ? "Signing up..." : "Sign Up"}
+                    </Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-                onPress={handleGoogleLogin}
-                style={styles.googleButton}
-            >
-                <Text style={styles.googleButtonText}>Continue with Google</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleGoogleLogin}
+                    style={styles.googleButton}
+                >
+                    <Text style={styles.googleButtonText}>Continue with Google</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.push("/login")}>
-                <Text style={styles.link}>Already have an account? Login</Text>
-            </TouchableOpacity>
-        </View>
+                <TouchableOpacity onPress={() => router.push("/login")}>
+                    <Text style={styles.link}>Already have an account? Login</Text>
+                </TouchableOpacity>
+            </View>
+        </TouchableWithoutFeedback>
     );
 }
 

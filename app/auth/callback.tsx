@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { View, ActivityIndicator } from "react-native";
-import { useRouter } from "expo-router";
 import { supabase } from "@/lib/superbase";
+import { useRouter } from "expo-router";
+import { useEffect } from "react";
+import { ActivityIndicator, View } from "react-native";
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export default function AuthCallback() {
       if (data.session) {
         router.replace("/");
       } else {
-        // give Supabase time to hydrate
+        
         setTimeout(() => router.replace("/login"), 500);
       }
     };

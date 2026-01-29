@@ -1,13 +1,15 @@
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
-    View,
+    Alert,
+    Keyboard,
+    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    StyleSheet,
-    Alert,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
-import { useState } from "react";
-import { useRouter } from "expo-router";
 import Toast from 'react-native-toast-message';
 
 import * as Linking from "expo-linking";
@@ -27,22 +29,6 @@ export default function LoginScreen() {
 
 
     const router = useRouter();
-
-
-    // useEffect(() => {
-    //     const { data: authListener } = supabase.auth.onAuthStateChange(
-    //         (_event, session) => {
-    //             if (session) {
-    //                 router.push("/");
-    //             }
-    //         }
-    //     );
-
-    //     return () => {
-    //         authListener.subscription.unsubscribe();
-    //     };
-    // }, []);
-
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -107,66 +93,66 @@ export default function LoginScreen() {
     };
 
 
-
-
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Welcome Back</Text>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.container}>
+                <Text style={styles.title}>Welcome Back</Text>
 
-            <TextInput
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                autoComplete="off"
-                //   textContentType="none"
-                //   importantForAutofill="no"
-                onFocus={() => setFocused('email')}
-                onBlur={() => setFocused(null)}
-                style={[
-                    styles.input,
-                    focused === 'email' && styles.focusRing,
-                ]}
-            />
+                <TextInput
+                    placeholder="Email"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                    autoComplete="off"
+                    //   textContentType="none"
+                    //   importantForAutofill="no"
+                    onFocus={() => setFocused('email')}
+                    onBlur={() => setFocused(null)}
+                    style={[
+                        styles.input,
+                        focused === 'email' && styles.focusRing,
+                    ]}
+                />
 
-            <TextInput
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoComplete="off"
-                // textContentType="none"
-                // importantForAutofill="no"
-                onFocus={() => setFocused('password')}
-                onBlur={() => setFocused(null)}
-                style={[
-                    styles.input,
-                    focused === 'password' && styles.focusRing,
-                ]}
-            />
+                <TextInput
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    autoComplete="off"
+                    // textContentType="none"
+                    // importantForAutofill="no"
+                    onFocus={() => setFocused('password')}
+                    onBlur={() => setFocused(null)}
+                    style={[
+                        styles.input,
+                        focused === 'password' && styles.focusRing,
+                    ]}
+                />
 
-            <TouchableOpacity
-                onPress={handleLogin}
-                style={styles.primaryButton}
-                disabled={loading}
-            >
-                <Text style={styles.primaryButtonText}>
-                    {loading ? "Logging in..." : "Login"}
-                </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleLogin}
+                    style={styles.primaryButton}
+                    disabled={loading}
+                >
+                    <Text style={styles.primaryButtonText}>
+                        {loading ? "Logging in..." : "Login"}
+                    </Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-                onPress={handleGoogleLogin}
-                style={styles.googleButton}
-            >
-                <Text style={styles.googleButtonText}>Continue with Google</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleGoogleLogin}
+                    style={styles.googleButton}
+                >
+                    <Text style={styles.googleButtonText}>Continue with Google</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.push("/signup")}>
-                <Text style={styles.link}>Don’t have an account? Sign up</Text>
-            </TouchableOpacity>
-        </View>
+                <TouchableOpacity onPress={() => router.push("/signup")}>
+                    <Text style={styles.link}>Don’t have an account? Sign up</Text>
+                </TouchableOpacity>
+            </View>
+        </TouchableWithoutFeedback>
     );
 }
 

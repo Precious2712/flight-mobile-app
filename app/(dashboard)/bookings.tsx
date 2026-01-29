@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
     ActivityIndicator,
     FlatList,
+    StyleSheet,
+    Text,
     TouchableOpacity,
+    View,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import { supabase } from '../../lib/superbase';
 import { useProduct } from '@/context/useContext';
+import { supabase } from '../../lib/superbase';
 
-/* ================= TYPES ================= */
+
 
 type Airport = {
     city: string;
@@ -24,14 +24,13 @@ type Booking = {
     user_id: string;
     flight_id: string;
     airline: string;
-    from_airport: string; // JSON string
-    to_airport: string;   // JSON string
+    from_airport: string; 
+    to_airport: string;   
     departure_time: string;
     arrival_time: string;
     created_at: string | null;
 };
 
-/* ================= HELPERS ================= */
 
 const parseAirport = (value: string): Airport => {
     try {
@@ -41,7 +40,6 @@ const parseAirport = (value: string): Airport => {
     }
 };
 
-/* ================= COMPONENT ================= */
 
 export default function Bookings() {
     const { user } = useProduct();
