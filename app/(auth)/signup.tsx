@@ -43,7 +43,7 @@ export default function SignupScreen() {
                 email,
                 password,
                 options: {
-                    emailRedirectTo: 'exp://192.168.1.64:8081/--/login',
+                    emailRedirectTo: 'flightapp://auth/callback/--/login',
                 },
             })
 
