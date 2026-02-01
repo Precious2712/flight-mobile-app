@@ -13,7 +13,7 @@ export default function Footer() {
             </Text>
 
             
-            <View style={styles.linksRow}>
+            {/* <View style={styles.linksRow}>
                 <Pressable>
                     <Text style={styles.link}>About</Text>
                 </Pressable>
@@ -26,7 +26,7 @@ export default function Footer() {
                 <Pressable>
                     <Text style={styles.link}>Privacy</Text>
                 </Pressable>
-            </View>
+            </View> */}
 
             
             <View style={styles.divider} />

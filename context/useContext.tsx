@@ -66,6 +66,7 @@ type ProductContextType = {
     authLoading: boolean
     handleLogout: () => Promise<void>
     handleSubmit: () => Promise<void>
+    setFinalResults: React.Dispatch<React.SetStateAction<Flight[]>>
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined)
@@ -226,6 +227,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
                 user,
                 authLoading,
                 handleLogout,
+                setFinalResults
             }}
         >
             {children}

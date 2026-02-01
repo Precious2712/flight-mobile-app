@@ -82,7 +82,7 @@ export default function HomeHeader() {
                 >
                     <IconSymbol
                         name="line.3.horizontal"
-                        size={26}
+                        size={16}
                         color={colors.text}
                     />
                 </Pressable>

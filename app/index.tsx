@@ -1,13 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     ScrollView,
     StyleSheet,
     Modal,
     View,
     Text,
-    Pressable,
-    Animated,
-    PanResponder,
+    Pressable
 } from 'react-native'
 import { ThemedView } from '@/components/themed-view'
 import HomeHeader from '@/components/home-header/HomeHeader'
@@ -21,207 +19,150 @@ import FAQSection from '../components/home-header/faq-sections'
 import Footer from '../components/home-header/footer'
 import { useRouter } from 'expo-router'
 
-
 export default function Index() {
-    const { finalResults } = useProduct();
-    const [open, setOpen] = useState(false);
+    const { finalResults, setFinalResults } = useProduct()
+    const [open, setOpen] = useState(false)
 
-    const router = useRouter();
+    const router = useRouter()
 
     const handleBook = () => {
+        setOpen(false)
         router.push('/over-view')
     }
 
     useEffect(() => {
-        if (finalResults.length > 0) {
+        if (finalResults && finalResults.length > 0) {
             setOpen(true)
         }
     }, [finalResults])
 
+    const handleClose = () => {
+        setOpen(false);
+        setFinalResults([]);
+    };
 
-    const translateY = useRef(new Animated.Value(0)).current
-
-    const panResponder = useRef(
-        PanResponder.create({
-            onMoveShouldSetPanResponder: (_, gesture) => gesture.dy > 10,
-
-            onPanResponderMove: (_, gesture) => {
-                if (gesture.dy > 0) {
-                    translateY.setValue(gesture.dy)
-                }
-            },
-
-            onPanResponderRelease: (_, gesture) => {
-                if (gesture.dy > 150) {
-                    Animated.timing(translateY, {
-                        toValue: 1000,
-                        duration: 200,
-                        useNativeDriver: true,
-                    }).start(() => {
-                        translateY.setValue(0)
-                        setOpen(false)
-                    })
-                } else {
-                    Animated.spring(translateY, {
-                        toValue: 0,
-                        useNativeDriver: true,
-                    }).start()
-                }
-            },
-        })
-    ).current
 
     return (
         <ThemedView safe style={styles.container}>
             <HomeHeader />
 
-            <ScrollView contentContainerStyle={styles.content}>
-                <HeroSection />
-                <SearchScreen />
-                <FeaturesSection />
-                <PopularDestinations />
-                <Testimonials />
-                <FAQSection />
-                <Footer />
-            </ScrollView>
-
-            <Modal visible={open} animationType="slide" transparent>
-                <Animated.View
-                    style={[
-                        styles.modal,
-                        { transform: [{ translateY }] },
-                    ]}
-                    {...panResponder.panHandlers}
+            <View style={{ flex: 1, backgroundColor: '#E5E7EB' }}>
+                <ScrollView
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    showsVerticalScrollIndicator={false}
                 >
-                    <Text style={styles.title}>Available Flights</Text>
+                    <HeroSection />
+                    <SearchScreen />
+                    <FeaturesSection />
+                    <PopularDestinations />
+                    <Testimonials />
+                    <FAQSection />
+                    <Footer />
+                </ScrollView>
+            </View>
 
-                    <ScrollView>
-                        {finalResults.map((flight) => {
-                            const from = JSON.parse(flight.from_airport)
-                            const to = JSON.parse(flight.to_airport)
+            
+            <Modal visible={open} transparent animationType="fade">
+                <View style={styles.overlay}>
+                    <View style={styles.modal}>
+                        <Text style={styles.title}>Available Flights</Text>
 
-                            return (
-                                <View key={flight.id} style={styles.flightCard}>
-                                    <Text style={styles.airline}>
-                                        {flight.airline} ({flight.airline_code})
-                                    </Text>
+                        
+                        <View style={{ flex: 1 }}>
+                            <ScrollView
+                                showsVerticalScrollIndicator={false}
+                                contentContainerStyle={{ paddingBottom: 16 }}
+                            >
+                                {finalResults.map((flight) => {
+                                    const from = JSON.parse(flight.from_airport)
+                                    const to = JSON.parse(flight.to_airport)
 
-                                    <Text style={styles.meta}>
-                                        Flight ID: {flight.flight_id}
-                                    </Text>
-                                    <Text style={styles.meta}>
-                                        Flight Number: {flight.flight_number}
-                                    </Text>
+                                    return (
+                                        <View key={flight.id} style={styles.flightCard}>
+                                            <Text style={styles.airline}>
+                                                {flight.airline} ({flight.airline_code})
+                                            </Text>
 
-                                    <Text style={styles.route}>
-                                        {from.city} ({from.airportCode}) →{' '}
-                                        {to.city} ({to.airportCode})
-                                    </Text>
+                                            <Text style={styles.route}>
+                                                {from.city} ({from.airportCode}) →{' '}
+                                                {to.city} ({to.airportCode})
+                                            </Text>
 
-                                    <Text style={styles.meta}>
-                                        Departure Date: {flight.departure_date}
-                                    </Text>
-                                    <Text style={styles.meta}>
-                                        Departure Time: {flight.departure_time}
-                                    </Text>
-                                    <Text style={styles.meta}>
-                                        Arrival Time: {flight.arrival_time}
-                                    </Text>
+                                            <Text style={styles.meta}>
+                                                Departure: {flight.departure_date} •{' '}
+                                                {flight.departure_time}
+                                            </Text>
 
-                                    <Text style={styles.meta}>
-                                        Duration: {flight.duration}
-                                    </Text>
+                                            <Text style={styles.meta}>
+                                                Arrival: {flight.arrival_time}
+                                            </Text>
 
-                                    <Text style={styles.meta}>
-                                        Stops: {flight.stops}
-                                    </Text>
-                                    <Text style={styles.meta}>
-                                        Status: {flight.status}
-                                    </Text>
-                                    <Text style={styles.meta}>
-                                        Refundable: {flight.refundable ? 'Yes' : 'No'}
-                                    </Text>
+                                            <Text style={styles.meta}>
+                                                Duration: {flight.duration}
+                                            </Text>
 
-                                    <Text style={styles.section}>Baggage</Text>
-                                    <Text style={styles.meta}>
-                                        Cabin: {flight.baggage?.cabin}
-                                    </Text>
-                                    <Text style={styles.meta}>
-                                        Checked: {flight.baggage?.checked}
-                                    </Text>
+                                            <Text style={styles.meta}>
+                                                Stops: {flight.stops}
+                                            </Text>
 
-                                    <Text style={styles.section}>Cabin Classes</Text>
+                                            <Text style={styles.meta}>
+                                                Refundable: {flight.refundable ? 'Yes' : 'No'}
+                                            </Text>
 
-                                    {Array.isArray(flight.cabin_classes) &&
-                                        flight.cabin_classes.map((group, i) => {
-                                            const classes = Array.isArray(group)
-                                                ? group
-                                                : [group]
+                                            <Pressable
+                                                onPress={handleBook}
+                                                style={styles.searchButton}
+                                            >
+                                                <Text style={{ color: '#fff', fontWeight: '600' }}>
+                                                    Book Flight
+                                                </Text>
+                                            </Pressable>
+                                        </View>
+                                    )
+                                })}
+                            </ScrollView>
+                        </View>
 
-                                            return (
-                                                <View key={i} style={styles.classGroup}>
-                                                    {classes.map((cls, j) => (
-                                                        <Text key={j} style={styles.meta}>
-                                                            • {cls?.type ?? 'N/A'} — ₦
-                                                            {cls?.price ?? 'N/A'}
-                                                        </Text>
-                                                    ))}
-                                                </View>
-                                            )
-                                        })}
-
-                                    <Text style={styles.section}>Metadata</Text>
-                                    <Text style={styles.meta}>
-                                        DB ID: {flight.id}
-                                    </Text>
-                                    <Text style={styles.meta}>
-                                        Created At: {flight.created_at}
-                                    </Text>
-
-                                    <Pressable onPress={handleBook} style={styles.searchButton}>
-                                        <Text>Click</Text>
-                                    </Pressable>
-                                </View>
-                            )
-                        })}
-                    </ScrollView>
-
-                    <Pressable
-                        onPress={() => setOpen(false)}
-                        style={styles.closeBtn}
-                    >
-                        <Text style={styles.closeText}>Close</Text>
-                    </Pressable>
-                </Animated.View>
+                        <Pressable onPress={handleClose} style={styles.closeBtn}>
+                            <Text style={styles.closeText}>Close</Text>
+                        </Pressable>
+                    </View>
+                </View>
             </Modal>
         </ThemedView>
     )
 }
-
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
 
-    content: {
-        paddingBottom: 40,
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.35)',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
+
     modal: {
-        flex: 1,
-        padding: 20,
+        width: '90%',
+        height: '80%', 
         backgroundColor: '#fff',
+        borderRadius: 20,
+        padding: 16,
     },
 
     title: {
         fontSize: 20,
         fontWeight: '700',
-        marginBottom: 16,
+        textAlign: 'center',
+        marginBottom: 12,
     },
 
     flightCard: {
-        padding: 16,
+        padding: 14,
         borderRadius: 12,
         backgroundColor: '#F9FAFB',
         marginBottom: 12,
@@ -240,40 +181,30 @@ const styles = StyleSheet.create({
         marginVertical: 6,
     },
 
-    section: {
-        marginTop: 10,
-        fontSize: 15,
-        fontWeight: '600',
-    },
-
     meta: {
         fontSize: 14,
         color: '#6B7280',
-        marginTop: 2,
     },
 
-    classGroup: {
-        marginLeft: 10,
+    searchButton: {
+        marginTop: 10,
+        backgroundColor: '#2563EB',
+        paddingVertical: 12,
+        borderRadius: 12,
+        alignItems: 'center',
     },
 
     closeBtn: {
-        marginTop: 20,
-        alignItems: 'center',
+        marginTop: 10,
         paddingVertical: 12,
-        borderRadius: 8,
-        backgroundColor: '#2563EB',
+        borderRadius: 10,
+        backgroundColor: '#E5E7EB',
+        alignItems: 'center',
     },
 
     closeText: {
-        color: '#fff',
         fontSize: 16,
         fontWeight: '600',
-    },
-    searchButton: {
-        marginTop: 10,
-        backgroundColor: '#25eb99',
-        padding: 14,
-        borderRadius: 16,
-        alignItems: 'center',
+        color: '#111827',
     },
 })
