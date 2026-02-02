@@ -25,7 +25,10 @@ export default function SignupScreen() {
 
     const router = useRouter();
 
-    const redirectTo = Platform.OS === "web" ? "http://localhost:3000/auth/callback" : Linking.createURL("auth/callback");
+    // const redirectTo = Platform.OS === "web" ? "http://localhost:3000/auth/callback" : Linking.createURL("auth/callback");
+
+    const redirectTo = "exp://192.168.187.64:8081";
+
 
     const handleSignup = async () => {
         if (!email || !password) {
@@ -42,7 +45,9 @@ export default function SignupScreen() {
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
-                options: { emailRedirectTo: redirectTo },
+                options: {
+                    emailRedirectTo: "flightapp://auth/callback",
+                },
             });
 
             if (error) {

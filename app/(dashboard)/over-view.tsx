@@ -30,6 +30,10 @@ export default function Overview() {
 
     const handleBookFlight = async (flight: Flight) => {
         if (!user) {
+            Toast.show({
+                type: 'error',
+                text1: 'You must be sign in first to book a flight'
+            })
             router.push('/login')
             return
         }
@@ -103,6 +107,7 @@ export default function Overview() {
                 data={finalResults}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 24 }}
+                showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => {
                     const from = JSON.parse(item.from_airport)
                     const to = JSON.parse(item.to_airport)
@@ -183,6 +188,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
+        flex: 1
     },
     row: {
         flexDirection: 'row',
