@@ -3,21 +3,20 @@ import { useState } from "react";
 import {
     Alert,
     Keyboard,
+    Platform,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
+    TouchableWithoutFeedback,
 } from "react-native";
 
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 
 import { supabase } from "../../lib/superbase";
-
-import { TouchableWithoutFeedback } from "react-native";
-import Toast from 'react-native-toast-message';
-
+import Toast from "react-native-toast-message";
 
 export default function SignupScreen() {
     const [email, setEmail] = useState("");
@@ -26,71 +25,77 @@ export default function SignupScreen() {
 
     const router = useRouter();
 
+    const redirectTo = Platform.OS === "web" ? "http://localhost:3000/auth/callback" : Linking.createURL("auth/callback");
 
     const handleSignup = async () => {
         if (!email || !password) {
             Toast.show({
-                type: 'info',
-                text1: 'Email and password are required',
-            })
-            return
+                type: "info",
+                text1: "Email and password are required",
+            });
+            return;
         }
 
-        setLoading(true)
+        setLoading(true);
 
         try {
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
-                options: {
-                    emailRedirectTo: 'flightapp://auth/callback/--/login',
-                },
-            })
+                options: { emailRedirectTo: redirectTo },
+            });
 
             if (error) {
                 Toast.show({
-                    type: 'error',
-                    text1: 'Signup failed',
+                    type: "error",
+                    text1: "Signup failed",
                     text2: error.message,
-                })
-                return
+                });
+                return;
             }
-
 
             if (data?.user) {
                 Toast.show({
-                    type: 'success',
-                    text1: 'Account created 🎉',
-                    text2: 'Check your email to verify your account',
-                })
+                    type: "success",
+                    text1: "Account created 🎉",
+                    text2: "Check your email to verify your account",
+                });
             }
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
 
     const handleGoogleLogin = async () => {
-        const redirectTo = Linking.createURL("auth/callback");
+        console.log("Redirect URL:", redirectTo);
 
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: { redirectTo },
         });
 
+        console.log("OAuth data:", data);
+        console.log("OAuth error:", error);
+
         if (error) {
-            Alert.alert("Google Sign-in failed", error.message);
+            Toast.show({
+                type: "error",
+                text1: `Google Sign-in failed ${error.message}`,
+            });
             return;
         }
 
         if (data?.url) {
-            await WebBrowser.openAuthSessionAsync(
-                data.url,
-                redirectTo
-            );
+            await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+        } else {
+            Toast.show({
+                type: "error",
+                text1: `No OAuth URL returned. Check your redirect configuration`,
+                text2: 'Login failed'
+            });
         }
     };
-
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -124,10 +129,7 @@ export default function SignupScreen() {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    onPress={handleGoogleLogin}
-                    style={styles.googleButton}
-                >
+                <TouchableOpacity onPress={handleGoogleLogin} style={styles.googleButton}>
                     <Text style={styles.googleButtonText}>Continue with Google</Text>
                 </TouchableOpacity>
 
@@ -139,8 +141,6 @@ export default function SignupScreen() {
     );
 }
 
-
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -148,7 +148,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         justifyContent: "center",
     },
-
     title: {
         fontSize: 28,
         fontWeight: "700",
@@ -156,7 +155,6 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         color: "#111827",
     },
-
     input: {
         borderWidth: 1,
         borderColor: "#d1d5db",
@@ -166,35 +164,30 @@ const styles = StyleSheet.create({
         marginBottom: 14,
         backgroundColor: "#f9fafb",
     },
-
     primaryButton: {
         backgroundColor: "#2563eb",
         paddingVertical: 16,
         borderRadius: 10,
         marginTop: 10,
     },
-
     primaryButtonText: {
         color: "#ffffff",
         fontSize: 16,
         fontWeight: "600",
         textAlign: "center",
     },
-
     googleButton: {
         backgroundColor: "#000000",
         paddingVertical: 16,
         borderRadius: 10,
         marginTop: 14,
     },
-
     googleButtonText: {
         color: "#ffffff",
         fontSize: 16,
         fontWeight: "600",
         textAlign: "center",
     },
-
     link: {
         marginTop: 20,
         textAlign: "center",

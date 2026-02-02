@@ -27,7 +27,8 @@
           "data": [
             {
               "scheme": "flightapp",
-              "host": "auth"
+              "host": "auth",
+              "pathPrefix": "/callback"
             }
           ],
           "category": [

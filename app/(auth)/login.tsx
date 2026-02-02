@@ -1,8 +1,9 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Alert,
     Keyboard,
+    Platform,
     StyleSheet,
     Text,
     TextInput,
@@ -10,88 +11,100 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 
 import { supabase } from "../../lib/superbase";
 
-
 WebBrowser.maybeCompleteAuthSession();
+
+const redirectTo = Platform.OS === "web" ? "http://localhost:3000/auth/callback" : Linking.createURL("auth/callback");
+
 
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-
-    const [focused, setFocused] = useState<'email' | 'password' | null>(null)
-
+    const [focused, setFocused] = useState<"email" | "password" | null>(null);
 
     const router = useRouter();
+
+
+    useEffect(() => {
+        const { data: listener } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                if (session) {
+                    router.replace("/");
+                }
+            }
+        );
+
+        return () => {
+            listener.subscription.unsubscribe();
+        };
+    }, []);
+
 
     const handleLogin = async () => {
         if (!email || !password) {
             Toast.show({
-                type: 'info',
-                text1: 'Email and password are required',
-            })
-            return
+                type: "info",
+                text1: "Email and password are required",
+            });
+            return;
         }
 
-        setLoading(true)
+        setLoading(true);
 
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
-            })
+            });
 
             if (error) {
                 Toast.show({
-                    type: 'error',
-                    text1: 'Login failed',
+                    type: "error",
+                    text1: "Login failed",
                     text2: error.message,
-                })
-                return
+                });
+                return;
             }
 
             if (data?.session) {
                 Toast.show({
-                    type: 'success',
-                    text1: 'Login successful 🎉',
-                })
+                    type: "success",
+                    text1: "Login successful 🎉",
+                });
 
-                router.replace('/');
+                router.replace("/");
             }
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
-
+    };
 
 
     const handleGoogleLogin = async () => {
-        const redirectTo = Linking.createURL("auth/callback");
-
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: { redirectTo },
         });
 
         if (error) {
-            Alert.alert("Google Sign-in failed", error.message);
+            Toast.show({
+                type: "error",
+                text1: `Google Sign-in failed", ${error.message}`,
+            });
             return;
         }
 
         if (data?.url) {
-            await WebBrowser.openAuthSessionAsync(
-                data.url,
-                redirectTo
-            );
+            await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
         }
     };
-
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -104,14 +117,11 @@ export default function LoginScreen() {
                     onChangeText={setEmail}
                     autoCapitalize="none"
                     keyboardType="email-address"
-                    autoComplete="off"
-                    //   textContentType="none"
-                    //   importantForAutofill="no"
-                    onFocus={() => setFocused('email')}
+                    onFocus={() => setFocused("email")}
                     onBlur={() => setFocused(null)}
                     style={[
                         styles.input,
-                        focused === 'email' && styles.focusRing,
+                        focused === "email" && styles.focusRing,
                     ]}
                 />
 
@@ -120,14 +130,11 @@ export default function LoginScreen() {
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
-                    autoComplete="off"
-                    // textContentType="none"
-                    // importantForAutofill="no"
-                    onFocus={() => setFocused('password')}
+                    onFocus={() => setFocused("password")}
                     onBlur={() => setFocused(null)}
                     style={[
                         styles.input,
-                        focused === 'password' && styles.focusRing,
+                        focused === "password" && styles.focusRing,
                     ]}
                 />
 
@@ -145,17 +152,22 @@ export default function LoginScreen() {
                     onPress={handleGoogleLogin}
                     style={styles.googleButton}
                 >
-                    <Text style={styles.googleButtonText}>Continue with Google</Text>
+                    <Text style={styles.googleButtonText}>
+                        Continue with Google
+                    </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => router.push("/signup")}>
-                    <Text style={styles.link}>Don’t have an account? Sign up</Text>
+                    <Text style={styles.link}>
+                        Don’t have an account? Sign up
+                    </Text>
                 </TouchableOpacity>
             </View>
         </TouchableWithoutFeedback>
     );
 }
 
+// ---------------- STYLES ----------------
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -176,24 +188,18 @@ const styles = StyleSheet.create({
         padding: 14,
         fontSize: 16,
         marginBottom: 14,
-        backgroundColor: '#ffffff',
+        backgroundColor: "#ffffff",
+        borderColor: "#d1d5db",
     },
-
     focusRing: {
-        borderColor: '#2563eb',
+        borderColor: "#2563eb",
         borderWidth: 2,
-
-        // iOS ring
-        shadowColor: '#2563eb',
+        shadowColor: "#2563eb",
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.35,
         shadowRadius: 6,
-
-        // Android ring
         elevation: 4,
     },
-
-
     primaryButton: {
         backgroundColor: "#2563eb",
         paddingVertical: 16,
