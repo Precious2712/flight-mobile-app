@@ -26,7 +26,7 @@ export default function Index() {
     const router = useRouter()
 
     const handleBook = () => {
-        setOpen(false)
+        // setOpen(false)
         router.push('/over-view')
     }
 
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
 
     modal: {
         width: '90%',
-        height: '80%', 
+        height: '65%', 
         backgroundColor: '#fff',
         borderRadius: 20,
         padding: 16,
