@@ -60,13 +60,15 @@ type ProductContextType = {
     setToSelected: (v: boolean) => void
 
     finalResults: Flight[]
-    searchLoading: boolean
+    searchLoading: boolean;
+    open: boolean;
 
     user: User | null
     authLoading: boolean
     handleLogout: () => Promise<void>
     handleSubmit: () => Promise<void>
-    setFinalResults: React.Dispatch<React.SetStateAction<Flight[]>>
+    // setFinalResults: React.Dispatch<React.SetStateAction<Flight[]>>;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined)
@@ -86,10 +88,11 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
     const [user, setUser] = useState<User | null>(null)
     const [authLoading, setAuthLoading] = useState(true)
+    const [open, setOpen] = useState(false)
 
     const router = useRouter()
 
-    
+
     useEffect(() => {
         if (!from.trim()) {
             setFromResults([])
@@ -123,7 +126,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         return () => clearTimeout(timeout)
     }, [from])
 
-    
+
     useEffect(() => {
         if (!to.trim()) {
             setToResults([])
@@ -157,7 +160,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         return () => clearTimeout(timeout)
     }, [to])
 
-    
+
     const handleSubmit = async () => {
         if (!from || !to) {
             Toast.show({
@@ -177,7 +180,9 @@ export function ProductProvider({ children }: { children: ReactNode }) {
                     `from_airport.ilike.%${from}%,to_airport.ilike.%${to}%`
                 )
 
-            setFinalResults((data as Flight[]) ?? [])
+            setFinalResults((data as Flight[]) ?? []);
+
+            setOpen(true);
 
             console.log(data)
         } finally {
@@ -185,7 +190,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         }
     }
 
-   
+
     useEffect(() => {
         const loadSession = async () => {
             const { data } = await supabase.auth.getSession()
@@ -227,7 +232,9 @@ export function ProductProvider({ children }: { children: ReactNode }) {
                 user,
                 authLoading,
                 handleLogout,
-                setFinalResults
+                // setFinalResults,
+                setOpen,
+                open
             }}
         >
             {children}

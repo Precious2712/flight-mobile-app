@@ -28,6 +28,7 @@ export default function LoginScreen() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [focused, setFocused] = useState<"email" | "password" | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
 
     const router = useRouter();
 
@@ -125,18 +126,30 @@ export default function LoginScreen() {
                     ]}
                 />
 
-                <TextInput
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    onFocus={() => setFocused("password")}
-                    onBlur={() => setFocused(null)}
-                    style={[
-                        styles.input,
-                        focused === "password" && styles.focusRing,
-                    ]}
-                />
+                <View style={styles.passwordContainer}>
+                    <TextInput
+                        placeholder="Password"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={!showPassword}
+                        onFocus={() => setFocused("password")}
+                        onBlur={() => setFocused(null)}
+                        style={[
+                            styles.input,
+                            focused === "password" && styles.focusRing,
+                        ]}
+                    />
+
+                    <TouchableOpacity
+                        onPress={() => setShowPassword(!showPassword)}
+                        style={styles.showPasswordBtn}
+                    >
+                        <Text style={styles.showPasswordText}>
+                            {showPassword ? "Hide" : "Show"}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
 
                 <TouchableOpacity
                     onPress={handleLogin}
@@ -159,7 +172,7 @@ export default function LoginScreen() {
 
                 <TouchableOpacity onPress={() => router.push("/signup")}>
                     <Text style={styles.link}>
-                        Don’t have an account? Sign up
+                        Do not have an account? Sign up
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -167,7 +180,7 @@ export default function LoginScreen() {
     );
 }
 
-// ---------------- STYLES ----------------
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -231,4 +244,20 @@ const styles = StyleSheet.create({
         color: "#2563eb",
         fontWeight: "500",
     },
+
+    passwordContainer: {
+        position: "relative",
+    },
+
+    showPasswordBtn: {
+        position: "absolute",
+        right: 15,
+        top: 18,
+    },
+
+    showPasswordText: {
+        color: "#2563eb",
+        fontWeight: "600",
+    },
+
 });

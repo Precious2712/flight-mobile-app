@@ -3,7 +3,6 @@ import { useState } from "react";
 import {
     Alert,
     Keyboard,
-    Platform,
     StyleSheet,
     Text,
     TextInput,
@@ -22,6 +21,7 @@ export default function SignupScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const router = useRouter();
 
@@ -116,13 +116,25 @@ export default function SignupScreen() {
                     style={styles.input}
                 />
 
-                <TextInput
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    style={styles.input}
-                />
+                <View style={styles.passwordContainer}>
+                    <TextInput
+                        placeholder="Password"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={!showPassword}
+                        style={styles.input}
+                    />
+
+                    <TouchableOpacity
+                        onPress={() => setShowPassword(!showPassword)}
+                        style={styles.showPasswordBtn}
+                    >
+                        <Text style={styles.showPasswordText}>
+                            {showPassword ? "Hide" : "Show"}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
 
                 <TouchableOpacity
                     onPress={handleSignup}
@@ -200,4 +212,20 @@ const styles = StyleSheet.create({
         color: "#2563eb",
         fontWeight: "500",
     },
+
+    passwordContainer: {
+        position: "relative",
+    },
+
+    showPasswordBtn: {
+        position: "absolute",
+        right: 15,
+        top: 18,
+    },
+
+    showPasswordText: {
+        color: "#2563eb",
+        fontWeight: "600",
+    },
+
 });

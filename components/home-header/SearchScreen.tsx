@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '700',
         marginBottom: 20,
-        color: 'white',
+        color: 'black',
     },
 
     tripTypeWrapper: {

@@ -20,25 +20,16 @@ import Footer from '../components/home-header/footer'
 import { useRouter } from 'expo-router'
 
 export default function Index() {
-    const { finalResults, setFinalResults } = useProduct()
-    const [open, setOpen] = useState(false)
+    const { finalResults, open, setOpen } = useProduct();
 
     const router = useRouter()
 
     const handleBook = () => {
-        // setOpen(false)
-        router.push('/over-view')
+        router.replace('/over-view');
     }
 
-    useEffect(() => {
-        if (finalResults && finalResults.length > 0) {
-            setOpen(true)
-        }
-    }, [finalResults])
-
     const handleClose = () => {
-        setOpen(false);
-        setFinalResults([]);
+        setOpen(!open);
     };
 
 
@@ -114,7 +105,7 @@ export default function Index() {
                                                 style={styles.searchButton}
                                             >
                                                 <Text style={{ color: '#fff', fontWeight: '600' }}>
-                                                    Book Flight
+                                                    View Flight
                                                 </Text>
                                             </Pressable>
                                         </View>
