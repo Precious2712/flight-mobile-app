@@ -127,6 +127,8 @@ export default function Index() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#E5E7EB',
+        paddingBottom: 30
     },
 
     overlay: {
